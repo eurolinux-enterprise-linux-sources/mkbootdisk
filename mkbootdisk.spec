@@ -1,13 +1,16 @@
 Summary: Creates a boot floppy disk for booting a system.
 Name: mkbootdisk
 Version:  1.5.5
-Release: 1%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source: mkbootdisk-%{version}.tar.xz
+# fix for bug #761590
+Patch1: mkbootdisk-1.5-long-volid-fix.patch
 ExclusiveOs: Linux
 ExclusiveArch: %{ix86} sparc x86_64
 # requires (dracut or mkinitrd) and (genisoimage or dosfstools)
+Requires: genisoimage
 %ifnarch sparc sparc64
 Requires: syslinux
 %else
@@ -24,6 +27,7 @@ the system.
 
 %prep
 %setup -q
+%patch1 -p1 -b .long-volid-fix
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -38,6 +42,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_mandir}/man8/mkbootdisk.8*
 
 %changelog
+* Mon Feb 13 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 1.5.5-3
+- Added explicit requires for genisoimage
+  Resolves: rhbz#790039
+
+* Thu Feb  9 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 1.5.5-2
+- Fixed problem with long volume ID strings (long-volid-fix patch)
+  Resolves: rhbz#761590
+
 * Fri Jan 15 2010 Stepan Kasal <skasal@redhat.com> - 1.5.5-1
 - do not require dosfstools nor mkinitrd; tey are not needed for --iso
 - Resolves: 549098, #549099
